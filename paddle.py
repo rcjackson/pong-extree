@@ -32,7 +32,7 @@ class paddle:
     # Move paddle
     def move_paddle(self,delta):
         info = pygame.display.Info()
-        if(self.y+delta > 0 and self.y+delta < info.current_h):
+        if(self.y+delta > 0 and self.y+delta+self.size_y < info.current_h):
             self.y += delta
         
     # Update paddle image

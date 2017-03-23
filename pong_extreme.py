@@ -28,6 +28,10 @@ size = width, height = 800, 600
 screen = pygame.display.set_mode((800,600))
 pygame.display.set_caption('Pong Extreme v.0.1')
 pygame.mixer.init()
+joysticks = [pygame.joystick.Joystick(x) 
+                 for x in range(pygame.joystick.get_count())]
+for joystick in joysticks:
+    joystick.init()
 # Set random seed
 random.seed()
 
@@ -45,41 +49,36 @@ while get_option == 0:
 # Enable key hold down
 pygame.key.set_repeat(1,1)
 
-
 if('game' in globals()):
     state = 1
     while(game.p1_score < 30 and game.p2_score < 30 and state != -1):
-        while(state == 1):
-            initial_time = time.time()
-            # Clear screen
-            pygame.draw.rect(screen, black, (0,0,800,600))
-            # Update game
-            state = game.update_state()
-            
-            # Display score
-            info = pygame.display.Info()
-            Font = pygame.font.SysFont('Calibri', 130, bold=1)
-            Title_Surface = Font.render(str(game.p1_score),
-                                        1,
-                                        white)
-            screen.blit(Title_Surface, (int(0.3*info.current_w),
-                                        0))
-            Title_Surface = Font.render(str(game.p2_score),
-                                        1,
-                                        white)
-            screen.blit(Title_Surface, (int(0.6*info.current_w),
-                                        0))
-            pygame.display.flip()
+        initial_time = time.time()
+        # Clear screen
+        pygame.draw.rect(screen, black, (0,0,800,600))
+        # Update game
+        state = game.update_state()
         
-            # Throttle speed to 120 fps
+        # Display score
+        info = pygame.display.Info()
+        Font = pygame.font.SysFont('Calibri', 130, bold=1)
+        Title_Surface = Font.render(str(game.p1_score),
+                                    1,
+                                    white)
+        screen.blit(Title_Surface, (int(0.3*info.current_w),
+                                    0))
+        Title_Surface = Font.render(str(game.p2_score),
+                                    1,
+                                    white)
+        screen.blit(Title_Surface, (int(0.6*info.current_w),
+                                    0))
+        pygame.display.flip()
+    
+        # Throttle speed to 120 fps
+        cur_time = time.time()
+        while(cur_time - initial_time < 1/120):
             cur_time = time.time()
-            while(cur_time - initial_time < 1/120):
-                cur_time = time.time()
             
-        if(state == 2):
-            game.p2_score += 1
-        elif(state == 3):
-            game.p1_score += 1        
+             
         game.reset_positions()
         print(game.p2_score)
         print(game.p1_score)

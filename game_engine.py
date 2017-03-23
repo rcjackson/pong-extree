@@ -36,7 +36,10 @@ class game_engine:
         self.p2_score = 0
         
         self.ting_sound = pygame.mixer.Sound('reflect.wav')
-
+        self.victory_sound = pygame.mixer.Sound('victory.wav')
+        self.defeat_sound = pygame.mixer.Sound('loss.wav')
+        self.joysticks = [pygame.joystick.Joystick(x) 
+                          for x in range(pygame.joystick.get_count())]
     def reset_positions(self):
         __info = pygame.display.Info()
         self.x = int(__info.current_w*0.5)
@@ -65,6 +68,13 @@ class game_engine:
                 if(event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN):
                     self.player2.move_paddle(-2)   
                 # Add joystick support later
+                
+        # Handle joystick up
+        if(self.joysticks[0].get_axis(1) < -0.5):
+            self.player1.move_paddle(-4)
+        
+        if(self.joysticks[0].get_axis(1) > 0.5):
+            self.player1.move_paddle(4)        
         
         if(self.num_players == 1):
             # Right now have the AI just chase the ball it is closest to in y
@@ -101,6 +111,10 @@ class game_engine:
                 else:
                     self.p2_score += 1   # 2 = player 1 loses
                     self.balls.remove(a_ball)
+                    if(self.num_players == 2):
+                        self.victory_sound.play()
+                    else:
+                        self.defeat_sound.play()
                     
            
             # Check to see if ball is touching paddle
@@ -113,6 +127,17 @@ class game_engine:
                 else:
                     self.p1_score += 1   # 2 = player 1 loses
                     self.balls.remove(a_ball)
+                    self.victory_sound.play()
+            
+            # Check to see if ball is colliding with other balls
+            for other_balls in self.balls:
+                if(other_balls != a_ball):
+                    if(other_balls.x >= a_ball.x and
+                       other_balls.x <= a_ball.x+a_ball.size and
+                       other_balls.y >= a_ball.y and
+                       other_balls.y <= a_ball.y+a_ball.size):
+                        a_ball.x_reflect()
+                        a_ball.y_reflect()    
                    
         # If no balls are left add a ball
         if(len(self.balls) == 0):

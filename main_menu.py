@@ -62,7 +62,8 @@ def do_menu(screen):
                                 white)
     screen.blit(Title_Surface4, (int(0.2*info.current_w),
                                 int((0.2+4*spacing)*info.current_h)))
-    
+    joysticks = [pygame.joystick.Joystick(x) 
+                 for x in range(pygame.joystick.get_count())]
     cur_option = 1
     enter_entered = 0
     while enter_entered == 0:
@@ -99,6 +100,34 @@ def do_menu(screen):
             if(event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN):
                 enter_entered == 1
                 return cur_option
-                    
+            # Handle joysticks
+            if(event.type == pygame.JOYHATMOTION):
+                dpad = event.value
+                if(dpad[1] > 0.5):
+                    if(cur_option > 1):
+                        cur_option -= 1
+                    else:
+                        cur_option = 4    
+                elif(dpad[1] < -0.5):
+                    if(cur_option < 4):
+                        cur_option += 1
+                    else:
+                        cur_option = 1
         
+            if(event.type == pygame.JOYAXISMOTION):
+                if(event.value < -0.5 and event.axis == 1):
+                    if(cur_option > 1):
+                        cur_option -= 1
+                    else:
+                        cur_option = 4   
+                elif(event.value > 0.5 and event.axis == 1):
+                    if(cur_option < 4):
+                        cur_option += 1
+                    else:
+                        cur_option = 1
+#        # Handle joysticks    
+        
+        if(joysticks[0].get_button(0) == True):
+            enter_entered == 1
+            return cur_option
     return -4
